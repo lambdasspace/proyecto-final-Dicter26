@@ -1,3 +1,5 @@
+:- use_module(library(clpfd)).
+
 row(Sudoku, N, Row) :-
     N0 is N-1,
     N1 is N0*9+1, nth1(N1, Sudoku, X1),
@@ -90,3 +92,19 @@ check(SolvedSudoku, N) :-
 sudoku(Sudoku, SolvedSudoku) :-
     phrase(program(SolvedSudoku), Sudoku),!,
     maplist(check(SolvedSudoku), SolvedSudoku).
+
+%x = [4,x,x,x,6,x,9,1,x,2,x,x,x,x,7,x,5,x,x,9,x,8,x,x,x,2,x,x,x,1,6,x,9,x,x,2,x,8,x,x,x,x,x,6,3,x,7,x,x,4,x,x,x,x,7,x,3,x,x,8,x,9,x,x,x,x,x,3,x,4,x,5,x,4,x,9,x,x,6,x,x]
+
+sudoku(Rows) :-
+    length(Rows, 9), maplist(same_length(Rows), Rows),
+    append(Rows, Vs), Vs ins 1..9,
+    maplist(all_distinct, Rows), 
+    transpose(Rows, Columns),  
+    maplist(all_distinct, Columns),
+    Rows = [A,B,C,D,E,F,G,H,I],
+    blocks(A, B, C), blocks(D, E, F), blocks(G, H, I).
+
+blocks([], [], []).
+blocks([A,B,C|Bs1], [D,E,F|Bs2], [G,H,I|Bs3]) :-
+    all_distinct([A,B,C,D,E,F,G,H,I]),
+    blocks(Bs1, Bs2, Bs3).
